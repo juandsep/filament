@@ -7,7 +7,8 @@ use Closure;
 interface DecisionDriver
 {
     /**
-     * The name the cache stores decisions under.
+     * The name the cache stores decisions under. Different models give
+     * different scores, so it should name the model too, not just the service.
      */
     public function name(): string;
 

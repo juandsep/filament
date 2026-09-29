@@ -74,7 +74,7 @@ class TypeSafeDriverTest extends TestCase
 
             return $request->url() === 'https://api.typesafe.ai/v1/systemone'
                 && $request->hasHeader('Authorization', 'Bearer test-key')
-                && $request['model'] === 'jev-latest'
+                && $request['model'] === 'jev-1.13.0'
                 && preg_match('/^k[0-9a-f]{6}$/', $tag)
                 && ! str_contains(json_encode($request->data()), '42')
                 && $request['questions'][$tag] === [
@@ -125,7 +125,7 @@ class TypeSafeDriverTest extends TestCase
         $this->assertSame('fake', app(DecisionDriver::class)->name());
 
         config(['vibefilter.driver' => 'typesafe']);
-        $this->assertSame('typesafe', app(DecisionDriver::class)->name());
+        $this->assertSame('typesafe:jev-1.13.0', app(DecisionDriver::class)->name());
     }
 
     public function test_a_rate_limited_batch_is_retried(): void

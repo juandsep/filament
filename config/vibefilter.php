@@ -12,7 +12,9 @@ return [
         'typesafe' => [
             'api_key' => env('TYPESAFE_API_KEY'),
             'base_url' => env('TYPESAFE_BASE_URL', 'https://api.typesafe.ai/v1'),
-            'model' => env('TYPESAFE_MODEL', 'jev-latest'),
+            // A fixed version rather than "jev-latest": cached scores are kept per
+            // model, and an alias would silently mix scores from two versions.
+            'model' => env('TYPESAFE_MODEL', 'jev-1.13.0'),
             'timeout' => 60,
             // Pauses (ms) before retrying a batch that hit a rate limit or a server error.
             'retry_delays' => [500, 2000, 5000],

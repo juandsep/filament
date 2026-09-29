@@ -34,9 +34,10 @@ class OpenRouterDriverTest extends TestCase
             && $request['model'] === 'typesafe/jev-1.13');
     }
 
-    public function test_its_decisions_are_cached_apart_from_typesafe(): void
+    public function test_its_decisions_are_cached_per_service_and_model(): void
     {
-        $this->assertSame('openrouter', (new OpenRouterDriver('key'))->name());
+        $this->assertSame('openrouter:typesafe/jev-1.13', (new OpenRouterDriver('key'))->name());
+        $this->assertSame('openrouter:other/model', (new OpenRouterDriver('key', model: 'other/model'))->name());
     }
 
     public function test_a_missing_key_names_the_openrouter_variable(): void

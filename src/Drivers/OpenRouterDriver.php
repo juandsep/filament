@@ -24,7 +24,7 @@ class OpenRouterDriver extends TypeSafeDriver
         parent::__construct($apiKey, $baseUrl, $model, $timeout, $batchSize, $concurrency, $retryDelays);
     }
 
-    public function name(): string
+    protected function service(): string
     {
         return 'openrouter';
     }

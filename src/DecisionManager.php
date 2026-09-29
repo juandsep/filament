@@ -25,7 +25,7 @@ class DecisionManager extends Manager
         return new TypeSafeDriver(
             apiKey: $config['api_key'] ?? null,
             baseUrl: $config['base_url'] ?? 'https://api.typesafe.ai/v1',
-            model: $config['model'] ?? 'jev-latest',
+            model: $config['model'] ?? 'jev-1.13.0',
             timeout: $config['timeout'] ?? 60,
             batchSize: $this->config->get('vibefilter.batch_size', 100),
             concurrency: $this->config->get('vibefilter.concurrency', 10),

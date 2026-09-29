@@ -40,7 +40,7 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
     public function __construct(
         protected ?string $apiKey,
         protected string $baseUrl = 'https://api.typesafe.ai/v1',
-        protected string $model = 'jev-latest',
+        protected string $model = 'jev-1.13.0',
         protected int $timeout = 60,
         protected int $batchSize = 100,
         protected int $concurrency = 10,
@@ -48,7 +48,16 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
         protected array $retryDelays = [500, 2000, 5000],
     ) {}
 
+    /**
+     * The service and the model, e.g. "typesafe:jev-1.13.0", so scores from
+     * different models never mix in the cache.
+     */
     public function name(): string
+    {
+        return $this->service() . ':' . $this->model;
+    }
+
+    protected function service(): string
     {
         return 'typesafe';
     }
