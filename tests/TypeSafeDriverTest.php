@@ -84,7 +84,8 @@ class TypeSafeDriverTest extends TestCase
     {
         $this->fakeJev();
 
-        $this->driver()->decide('The customer is angry.', [42 => 'angry text']);
+        // Seven digits can never show up by chance inside a six-character tag.
+        $this->driver()->decide('The customer is angry.', [9876543 => 'angry text']);
 
         Http::assertSent(function (Request $request) {
             $record = $request['state']['records'][0];
@@ -94,7 +95,8 @@ class TypeSafeDriverTest extends TestCase
                 && $request->hasHeader('Authorization', 'Bearer test-key')
                 && $request['model'] === 'jev-1.13.0'
                 && preg_match('/^k[0-9a-f]{6}$/', $tag)
-                && ! str_contains(json_encode($request->data()), '42')
+                && $record === ['id' => "#{$tag}", 'text' => 'angry text']
+                && ! str_contains(json_encode($request->data()), '9876543')
                 && $request['questions'][$tag] === [
                     'type' => 'noul',
                     'instructions' => "Regarding record #{$tag}: The customer is angry.",
