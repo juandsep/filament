@@ -4,6 +4,7 @@ namespace Vibefilter\Filament;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Vibefilter\Filament\Contracts\DecisionDriver;
 
 class VibefilterServiceProvider extends PackageServiceProvider
 {
@@ -15,5 +16,11 @@ class VibefilterServiceProvider extends PackageServiceProvider
             ->name(static::$name)
             ->hasConfigFile()
             ->hasMigration('create_vibefilter_tables');
+    }
+
+    public function packageRegistered(): void
+    {
+        $this->app->singleton(DecisionManager::class, fn ($app) => new DecisionManager($app));
+        $this->app->bind(DecisionDriver::class, fn ($app) => $app->make(DecisionManager::class)->driver());
     }
 }
