@@ -14,6 +14,7 @@ use Psr\Http\Message\ResponseInterface;
 use Throwable;
 use Vibefilter\Filament\Contracts\CountsRequests;
 use Vibefilter\Filament\Contracts\DecisionDriver;
+use Vibefilter\Filament\Contracts\ReportsCost;
 use Vibefilter\Filament\Exceptions\DriverException;
 
 /**
@@ -36,6 +37,9 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
     protected int $answered = 0;
 
     protected int $failedAttempts = 0;
+
+    /** US dollars the service reported for the current call. */
+    protected float $cost = 0.0;
 
     public function __construct(
         protected ?string $apiKey,
@@ -91,6 +95,7 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
         $this->lastAttemptCount = 0;
         $this->answered = 0;
         $this->failedAttempts = 0;
+        $this->cost = 0.0;
 
         if ($texts === []) {
             return [];
@@ -157,10 +162,15 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
             return $request;
         });
         $reportProgress = Middleware::mapResponse(function (ResponseInterface $response) use ($onProgress) {
-            $response->getStatusCode() < 400 ? $this->answered++ : $this->failedAttempts++;
+            if ($response->getStatusCode() < 400) {
+                $this->answered++;
+                $this->cost += $this->costOf($response);
+            } else {
+                $this->failedAttempts++;
+            }
 
             if ($onProgress) {
-                $onProgress($this->answered, $this->lastRequestCount, $this->failedAttempts);
+                $onProgress($this->answered, $this->lastRequestCount, $this->failedAttempts, $this instanceof ReportsCost ? $this->cost : null);
             }
 
             return $response;
@@ -205,6 +215,15 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
         }
 
         return [$scores, $failed];
+    }
+
+    /**
+     * What one response cost in US dollars. TypeSafe's own API doesn't say,
+     * so this is 0 here; drivers for services that do report it override it.
+     */
+    protected function costOf(ResponseInterface $response): float
+    {
+        return 0.0;
     }
 
     protected function asThrowable(mixed $response): ?Throwable

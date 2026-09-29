@@ -17,6 +17,7 @@ use LogicException;
 use Vibefilter\Filament\Exceptions\DriverException;
 use Vibefilter\Filament\Scorer;
 use Vibefilter\Filament\ScoringReport;
+use Vibefilter\Filament\Support\Numbers;
 
 /**
  * A table filter that takes a plain-English statement and keeps the rows
@@ -223,7 +224,7 @@ class VibeFilter extends BaseFilter
             $scores = $scorer->score(
                 $statement,
                 $texts,
-                fn (int $done, int $total, int $retries) => $this->streamProgress($unscored, $done, $total, $retries),
+                fn (int $done, int $total, int $retries, ?float $cost = null) => $this->streamProgress($unscored, $done, $total, $retries, $cost),
             );
         } catch (DriverException $exception) {
             // Batches that came back before the failure are cached: filter on those.
@@ -257,29 +258,36 @@ class VibeFilter extends BaseFilter
     {
         $details = [$report->requests
             ? trans_choice('vibefilter::vibefilter.report.scored_in', $report->scored, [
-                'count' => number_format($report->scored),
+                'count' => Numbers::format($report->scored),
                 'requests' => trans_choice('vibefilter::vibefilter.report.requests', $report->requests),
             ])
-            : trans_choice('vibefilter::vibefilter.report.scored', $report->scored, ['count' => number_format($report->scored)]),
+            : trans_choice('vibefilter::vibefilter.report.scored', $report->scored, ['count' => Numbers::format($report->scored)]),
         ];
 
         if ($report->retries()) {
             $details[] = __('vibefilter::vibefilter.report.retried', ['count' => $report->retries()]);
         }
 
-        $details[] = __('vibefilter::vibefilter.report.seconds', ['seconds' => number_format($report->seconds, 1)]);
-
         if ($report->cached) {
-            $details[] = __('vibefilter::vibefilter.report.cached', ['count' => number_format($report->cached)]);
+            $details[] = __('vibefilter::vibefilter.report.cached', ['count' => Numbers::format($report->cached)]);
         }
+
+        // What it took goes on a line of its own.
+        $totals = [];
+
+        if ($report->cost !== null) {
+            $totals[] = __('vibefilter::vibefilter.report.cost', ['amount' => Numbers::money($report->cost)]);
+        }
+
+        $totals[] = __('vibefilter::vibefilter.report.seconds', ['seconds' => Numbers::format($report->seconds, 1)]);
 
         Notification::make()
             ->success()
             ->title(__('vibefilter::vibefilter.report.title', [
-                'matching' => number_format($matching),
-                'total' => number_format($report->rows),
+                'matching' => Numbers::format($matching),
+                'total' => Numbers::format($report->rows),
             ]))
-            ->body(implode(' · ', $details))
+            ->body(e(implode(' · ', $details)) . '<br>' . e(implode(' · ', $totals)))
             ->send();
     }
 
@@ -313,10 +321,10 @@ class VibeFilter extends BaseFilter
             ->warning()
             ->persistent()
             ->title(__('vibefilter::vibefilter.failure.partial_title', [
-                'scored' => number_format($scored),
-                'total' => number_format($total),
+                'scored' => Numbers::format($scored),
+                'total' => Numbers::format($total),
             ]))
-            ->body(trans_choice('vibefilter::vibefilter.failure.partial_body', $missing, ['count' => number_format($missing)])
+            ->body(trans_choice('vibefilter::vibefilter.failure.partial_body', $missing, ['count' => Numbers::format($missing)])
                 . ' (' . $exception->getMessage() . ')')
             ->actions([$retry])
             ->send();
@@ -326,18 +334,18 @@ class VibeFilter extends BaseFilter
      * Pushes the progress bar into the table while the request is still running
      * (Livewire streaming). The bar disappears when the table re-renders.
      */
-    protected function streamProgress(int $rows, int $done, int $total, int $retries): void
+    protected function streamProgress(int $rows, int $done, int $total, int $retries, ?float $cost = null): void
     {
         $this->component()->stream(
-            content: $this->progressHtml($rows, $done, $total, $retries),
+            content: $this->progressHtml($rows, $done, $total, $retries, $cost),
             replace: true,
             el: '[data-vibefilter-progress]',
         );
     }
 
-    protected function progressHtml(int $rows, int $done, int $total, int $retries): string
+    protected function progressHtml(int $rows, int $done, int $total, int $retries, ?float $cost = null): string
     {
-        return View::make('vibefilter::progress', compact('rows', 'done', 'total', 'retries'))->render();
+        return View::make('vibefilter::progress', compact('rows', 'done', 'total', 'retries', 'cost'))->render();
     }
 
     /**
@@ -369,12 +377,12 @@ class VibeFilter extends BaseFilter
         Notification::make('vibefilter-limit-' . $token)
             ->warning()
             ->persistent()
-            ->title(trans_choice('vibefilter::vibefilter.limit.title', $unscored, ['count' => number_format($unscored)]))
-            ->body(__('vibefilter::vibefilter.limit.body', [
-                'total' => number_format($total),
-                'unscored' => number_format($unscored),
-                'limit' => number_format($max),
-            ]))
+            ->title(trans_choice('vibefilter::vibefilter.limit.title', $unscored, ['count' => Numbers::format($unscored)]))
+            ->body(e(__('vibefilter::vibefilter.limit.body', [
+                'total' => Numbers::format($total),
+                'unscored' => Numbers::format($unscored),
+                'limit' => Numbers::format($max),
+            ])) . '<br><br>' . e(__('vibefilter::vibefilter.limit.hint')))
             ->actions([
                 Action::make('runAnyway')
                     ->label(__('vibefilter::vibefilter.limit.run_anyway'))

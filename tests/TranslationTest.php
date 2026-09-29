@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Livewire\Livewire;
 use Vibefilter\Filament\Contracts\DecisionDriver;
 use Vibefilter\Filament\Drivers\FakeDriver;
+use Vibefilter\Filament\Support\Numbers;
 use Vibefilter\Filament\Tests\Fixtures\ListReviews;
 use Vibefilter\Filament\Tests\Fixtures\Review;
 
@@ -23,6 +24,23 @@ class TranslationTest extends TestCase
         }
     }
 
+    public function test_numbers_use_the_languages_separators(): void
+    {
+        $this->assertSame('1,234.5', Numbers::format(1234.5, 1));
+
+        app()->setLocale('hu');
+
+        $this->assertSame("1\u{00A0}234,5", Numbers::format(1234.5, 1));
+    }
+
+    public function test_money_keeps_two_significant_digits_below_a_cent(): void
+    {
+        $this->assertSame('0.0031', Numbers::money(0.00312));
+        $this->assertSame('0.000013', Numbers::money(0.0000133));
+        $this->assertSame('0.27', Numbers::money(0.271));
+        $this->assertSame('0.00', Numbers::money(0.0));
+    }
+
     public function test_the_filter_speaks_the_apps_language(): void
     {
         app()->setLocale('hu');
@@ -32,7 +50,7 @@ class TranslationTest extends TestCase
 
         Livewire::test(ListReviews::class)
             ->filterTable('vibe', ['statement' => 'The customer is angry.'])
-            ->assertNotified('2 sorból 1 felel meg');
+            ->assertNotified('2 sorból 1 illik a vibe-hoz');
     }
 
     public function test_the_limit_pop_up_and_the_progress_bar_are_translated(): void
@@ -47,9 +65,10 @@ class TranslationTest extends TestCase
             ->filterTable('vibe', ['statement' => 'The customer is angry.'])
             ->assertNotified('2 sor vár pontozásra');
 
-        $bar = view('vibefilter::progress', ['rows' => 2, 'done' => 0, 'total' => 1, 'retries' => 0])->render();
+        $bar = view('vibefilter::progress', ['rows' => 2, 'done' => 0, 'total' => 1, 'retries' => 0, 'cost' => 0.0031])->render();
 
         $this->assertStringContainsString('2 sor pontozása', $bar);
         $this->assertStringContainsString('0 / 1 kérés kész', $bar);
+        $this->assertStringContainsString("Költség:\u{00A0}\$0,0031", $bar);
     }
 }

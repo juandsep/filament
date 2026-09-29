@@ -4,7 +4,7 @@
     role="status"
     style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; padding: 0.625rem 1rem; font-size: 0.875rem; border-top: 1px solid color-mix(in oklab, currentColor 10%, transparent);"
 >
-    <span style="font-weight: 500; white-space: nowrap;">{{ trans_choice('vibefilter::vibefilter.progress.scoring', $rows, ['count' => number_format($rows)]) }}</span>
+    <span style="font-weight: 500; white-space: nowrap;">{{ trans_choice('vibefilter::vibefilter.progress.scoring', $rows, ['count' => \Vibefilter\Filament\Support\Numbers::format($rows)]) }}</span>
 
     <div
         role="progressbar"
@@ -21,6 +21,9 @@
         {{ trans_choice('vibefilter::vibefilter.progress.requests', $total, ['done' => $done, 'total' => $total]) }}
         @if ($retries)
             · {{ __('vibefilter::vibefilter.progress.retried', ['count' => $retries]) }}
+        @endif
+        @if (isset($cost))
+            · {{ __('vibefilter::vibefilter.report.cost', ['amount' => \Vibefilter\Filament\Support\Numbers::money($cost)]) }}
         @endif
     </span>
 </div>

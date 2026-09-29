@@ -56,6 +56,26 @@ class ScorerTest extends TestCase
         $this->assertSame(1, Decision::count());
     }
 
+    public function test_the_report_counts_rows(): void
+    {
+        $scorer = $this->scorer();
+        $scorer->score('The customer is angry.', [1 => 'So angry.']);
+        $scorer->score('The customer is angry.', [1 => 'So angry.', 2 => 'Fine.', 3 => 'Fine.']);
+
+        $this->assertSame(3, $scorer->lastReport?->rows);
+        $this->assertSame(1, $scorer->lastReport->cached);
+        $this->assertSame(2, $scorer->lastReport->scored);
+        $this->assertCount(1, $this->driver->calls[1]['texts']);
+    }
+
+    public function test_unscored_counts_rows(): void
+    {
+        $this->scorer()->score('The customer is angry.', [1 => 'So angry.']);
+
+        $this->assertSame(2, $this->scorer()->unscored('The customer is angry.', [1 => 'So angry.', 2 => 'Fine.', 3 => 'Fine.']));
+        $this->assertSame(3, $this->scorer()->unscored('The customer is happy.', [1 => 'So angry.', 2 => 'Fine.', 3 => 'Fine.']));
+    }
+
     public function test_only_new_or_edited_texts_reach_the_driver(): void
     {
         $this->scorer()->score('The customer is angry.', [1 => 'So angry.', 2 => 'Lovely.']);

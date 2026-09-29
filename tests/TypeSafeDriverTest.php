@@ -9,6 +9,7 @@ use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Throwable;
 use Vibefilter\Filament\Contracts\DecisionDriver;
+use Vibefilter\Filament\Contracts\ReportsCost;
 use Vibefilter\Filament\Drivers\TypeSafeDriver;
 use Vibefilter\Filament\Exceptions\DriverException;
 
@@ -37,6 +38,23 @@ class TypeSafeDriverTest extends TestCase
     protected function fakeJev(): void
     {
         Http::fake(fn (Request $request) => $this->answer($request));
+    }
+
+    public function test_it_reports_no_cost(): void
+    {
+        Http::fake(fn (Request $request) => Http::response([
+            'answers' => collect($request['questions'])->map(fn () => ['type' => 'noul', 'noul' => 0.5]),
+            'usage' => ['input_tokens' => 317, 'output_tokens' => 25, 'cost' => 0.00125],
+        ]));
+        $costs = [];
+
+        $driver = new TypeSafeDriver('key');
+        $driver->decide('The customer is angry.', ['a'], onProgress: function (int $done, int $total, int $retries, ?float $cost) use (&$costs) {
+            $costs[] = $cost;
+        });
+
+        $this->assertNotInstanceOf(ReportsCost::class, $driver);
+        $this->assertSame([null], $costs);
     }
 
     public function test_scores_map_back_to_the_callers_keys_in_order(): void

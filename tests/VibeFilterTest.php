@@ -193,7 +193,7 @@ class VibeFilterTest extends TestCase
 
         Livewire::test(ListReviews::class)
             ->filterTable('vibe', ['statement' => 'The customer is angry.'])
-            ->assertNotified('1 of 2 rows match');
+            ->assertNotified('1 of 2 rows match the vibe');
     }
 
     public function test_a_run_answered_from_the_cache_stays_quiet(): void
@@ -203,7 +203,7 @@ class VibeFilterTest extends TestCase
 
         Livewire::test(ListReviews::class)
             ->filterTable('vibe', ['statement' => 'The customer is angry.'])
-            ->assertNotNotified('1 of 1 rows match')
+            ->assertNotNotified('1 of 1 rows match the vibe')
             ->assertCountTableRecords(1);
     }
 

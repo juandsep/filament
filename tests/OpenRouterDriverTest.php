@@ -15,11 +15,28 @@ class OpenRouterDriverTest extends TestCase
         Http::fake(function (Request $request) {
             $texts = collect($request['state']['records'])->pluck('text', 'id');
 
-            return Http::response(['answers' => collect($request['questions'])->map(fn ($question, $tag) => [
-                'type' => 'noul',
-                'noul' => str_contains($texts["#{$tag}"], 'angry') ? 0.9 : 0.1,
-            ])]);
+            return Http::response([
+                'answers' => collect($request['questions'])->map(fn ($question, $tag) => [
+                    'type' => 'noul',
+                    'noul' => str_contains($texts["#{$tag}"], 'angry') ? 0.9 : 0.1,
+                ]),
+                'usage' => ['input_tokens' => 317, 'output_tokens' => 25, 'cost' => 0.00125],
+            ]);
         });
+    }
+
+    public function test_it_adds_up_the_cost_openrouter_reports(): void
+    {
+        $this->fakeOpenRouter();
+        $driver = new OpenRouterDriver('key', batchSize: 1);
+        $progress = [];
+
+        $driver->decide('The customer is angry.', ['a', 'b', 'c'], onProgress: function (int $done, int $total, int $retries, ?float $cost) use (&$progress) {
+            $progress[] = $cost;
+        });
+
+        $this->assertEqualsWithDelta(0.00375, $driver->lastCost(), 1e-12);
+        $this->assertEqualsWithDelta(0.00375, end($progress), 1e-12);
     }
 
     public function test_it_sends_jev_requests_to_openrouter(): void

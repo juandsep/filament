@@ -11,5 +11,5 @@ All notable changes to `vibefilter/filament` will be documented in this file.
 - Content-based decision cache, kept per service and model: equal texts are scored once, edited rows get a new score, and switching models never mixes scores.
 - Filters only the rows left by the other filters and the search.
 - Asks before scoring more unscored rows than the limit, with a "Run anyway" button.
-- Live progress bar in the table while rows are scored.
+- Live progress bar in the table while rows are scored, and a summary of each run: matches, rows scored, requests, time, and, with OpenRouter, the cost.
 - Translatable interface, in English and Hungarian.

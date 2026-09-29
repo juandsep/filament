@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\Date;
 use Vibefilter\Filament\Contracts\CountsRequests;
 use Vibefilter\Filament\Contracts\DecisionDriver;
+use Vibefilter\Filament\Contracts\ReportsCost;
 use Vibefilter\Filament\Models\Decision;
 use Vibefilter\Filament\Models\Question;
 use Vibefilter\Filament\Support\TextNormalizer;
@@ -55,13 +56,15 @@ class Scorer
         }
 
         $counts = $this->driver instanceof CountsRequests && $missing !== [];
+        $sent = count(array_filter($hashes, fn (string $hash) => isset($missing[$hash])));
         $this->lastReport = new ScoringReport(
             rows: count($texts),
-            cached: count(array_unique($hashes)) - count($missing),
-            scored: count($missing),
+            cached: count($texts) - $sent,
+            scored: $sent,
             requests: $counts ? $this->driver->lastRequestCount() : 0,
             attempts: $counts ? $this->driver->lastAttemptCount() : 0,
             seconds: microtime(true) - $started,
+            cost: $this->driver instanceof ReportsCost && $missing !== [] ? $this->driver->lastCost() : null,
         );
 
         return array_map(fn (string $hash) => $known[$hash], $hashes);
@@ -89,17 +92,17 @@ class Scorer
     }
 
     /**
-     * How many distinct texts would have to go to the driver: the ones
-     * without a cached decision. Duplicates and cached texts cost nothing.
+     * How many rows have no cached decision yet. Rows sharing a text count
+     * one by one, although their text is only sent once.
      *
      * @param  array<array-key, string|null>  $texts
      */
     public function unscored(string $statement, array $texts): int
     {
-        $hashes = array_unique(array_map(
+        $hashes = array_map(
             fn (?string $text) => TextNormalizer::hash(TextNormalizer::text((string) $text)),
             $texts,
-        ));
+        );
 
         $question = Question::firstWhere('hash', TextNormalizer::hash(TextNormalizer::question($statement)));
 
@@ -107,7 +110,9 @@ class Scorer
             return count($hashes);
         }
 
-        return count($hashes) - count($this->cached($question, $hashes));
+        $known = $this->cached($question, array_unique($hashes));
+
+        return count(array_filter($hashes, fn (string $hash) => ! isset($known[$hash])));
     }
 
     protected function question(string $statement): Question

@@ -2,6 +2,11 @@
 
 return [
 
+    'number' => [
+        'decimal' => '.',
+        'thousands' => ',',
+    ],
+
     'filter' => [
         'label' => 'Vibe',
         'statement' => 'Show rows where…',
@@ -11,7 +16,8 @@ return [
 
     'limit' => [
         'title' => ':count row needs a fresh score|:count rows need a fresh score',
-        'body' => 'The table has :total rows with the other filters and the search applied, and :unscored of them have no cached score for this statement yet. The limit is :limit. Narrow the table down with other filters or a search to get under it, or run it on all of them now. The table isn\'t filtered until then.',
+        'body' => 'The table has :total rows with the other filters and the search applied, and :unscored of them have no cached score for this statement yet. The limit is :limit.',
+        'hint' => 'Narrow the table down with other filters or a search to get under it, or run it on all of them now. The table isn\'t filtered until then.',
         'run_anyway' => 'Run anyway',
     ],
 
@@ -23,13 +29,14 @@ return [
     ],
 
     'report' => [
-        'title' => ':matching of :total rows match',
-        'scored' => ':count new row scored|:count new rows scored',
-        'scored_in' => ':count new row scored in :requests|:count new rows scored in :requests',
+        'title' => ':matching of :total rows match the vibe',
+        'scored' => ':count row scored|:count rows scored',
+        'scored_in' => ':count row scored in :requests|:count rows scored in :requests',
         'requests' => ':count request|:count requests',
         'retried' => ':count retried after the API didn\'t answer',
-        'seconds' => ':seconds s',
-        'cached' => ':count answered from the cache',
+        'cost' => "Cost:\u{00A0}\$:amount",
+        'seconds' => "Time:\u{00A0}:seconds\u{00A0}s",
+        'cached' => ':count from the cache',
     ],
 
     'failure' => [

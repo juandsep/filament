@@ -15,6 +15,10 @@ Contributions are welcome and will be credited. Please read this before opening 
 - Update `README.md` and `CHANGELOG.md` if the behaviour changes.
 - Don't break the public API: the project follows [Semantic Versioning](https://semver.org/).
 
+## Translations
+
+New languages are very welcome. Copy `resources/lang/en/vibefilter.php` to `resources/lang/{locale}/vibefilter.php` and translate the values, leaving the keys and the `:placeholders` as they are. `TranslationTest` checks that every language file has all the keys.
+
 ## Running the checks
 
 ```bash
