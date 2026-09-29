@@ -22,5 +22,6 @@ class VibefilterServiceProvider extends PackageServiceProvider
     {
         $this->app->singleton(DecisionManager::class, fn ($app) => new DecisionManager($app));
         $this->app->bind(DecisionDriver::class, fn ($app) => $app->make(DecisionManager::class)->driver());
+        $this->app->bind(Scorer::class, fn ($app) => new Scorer($app->make(DecisionDriver::class)));
     }
 }
