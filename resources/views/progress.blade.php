@@ -4,11 +4,11 @@
     role="status"
     style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; padding: 0.625rem 1rem; font-size: 0.875rem; border-top: 1px solid color-mix(in oklab, currentColor 10%, transparent);"
 >
-    <span style="font-weight: 500; white-space: nowrap;">Scoring {{ number_format($rows) }} {{ str('row')->plural($rows) }}</span>
+    <span style="font-weight: 500; white-space: nowrap;">{{ trans_choice('vibefilter::vibefilter.progress.scoring', $rows, ['count' => number_format($rows)]) }}</span>
 
     <div
         role="progressbar"
-        aria-label="Vibe filter progress"
+        aria-label="{{ __('vibefilter::vibefilter.progress.label') }}"
         aria-valuemin="0"
         aria-valuemax="{{ $total }}"
         aria-valuenow="{{ $done }}"
@@ -18,9 +18,9 @@
     </div>
 
     <span style="white-space: nowrap; font-variant-numeric: tabular-nums; opacity: 0.75;">
-        {{ $done }} / {{ $total }} {{ str('request')->plural($total) }} done
+        {{ trans_choice('vibefilter::vibefilter.progress.requests', $total, ['done' => $done, 'total' => $total]) }}
         @if ($retries)
-            · {{ $retries }} retried
+            · {{ __('vibefilter::vibefilter.progress.retried', ['count' => $retries]) }}
         @endif
     </span>
 </div>

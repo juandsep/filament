@@ -52,12 +52,12 @@ class VibeFilter extends BaseFilter
     {
         parent::setUp();
 
-        $this->label('Vibe');
+        $this->label(__('vibefilter::vibefilter.filter.label'));
 
         $this->schema([
             TextInput::make('statement')
-                ->label('Show rows where…')
-                ->placeholder('The customer is angry')
+                ->label(__('vibefilter::vibefilter.filter.statement'))
+                ->placeholder(__('vibefilter::vibefilter.filter.placeholder'))
                 ->maxLength(500),
         ]);
 
@@ -68,7 +68,7 @@ class VibeFilter extends BaseFilter
         ));
 
         $this->indicateUsing(fn (array $data): array => filled($data['statement'] ?? null)
-            ? [Indicator::make('Vibe: ' . $data['statement'])]
+            ? [Indicator::make(__('vibefilter::vibefilter.filter.indicator', ['statement' => $data['statement']]))]
             : []);
 
         $this->excludeWhenResolvingRecord();
@@ -255,25 +255,30 @@ class VibeFilter extends BaseFilter
      */
     protected function reportRun(ScoringReport $report, int $matching): void
     {
-        $details = [number_format($report->scored) . ' new ' . str('row')->plural($report->scored) . ' scored'];
-
-        if ($report->requests) {
-            $details[0] .= ' in ' . $report->requests . ' ' . str('request')->plural($report->requests);
-        }
+        $details = [$report->requests
+            ? trans_choice('vibefilter::vibefilter.report.scored_in', $report->scored, [
+                'count' => number_format($report->scored),
+                'requests' => trans_choice('vibefilter::vibefilter.report.requests', $report->requests),
+            ])
+            : trans_choice('vibefilter::vibefilter.report.scored', $report->scored, ['count' => number_format($report->scored)]),
+        ];
 
         if ($report->retries()) {
-            $details[] = $report->retries() . ' retried after the API didn\'t answer';
+            $details[] = __('vibefilter::vibefilter.report.retried', ['count' => $report->retries()]);
         }
 
-        $details[] = number_format($report->seconds, 1) . ' s';
+        $details[] = __('vibefilter::vibefilter.report.seconds', ['seconds' => number_format($report->seconds, 1)]);
 
         if ($report->cached) {
-            $details[] = number_format($report->cached) . ' answered from the cache';
+            $details[] = __('vibefilter::vibefilter.report.cached', ['count' => number_format($report->cached)]);
         }
 
         Notification::make()
             ->success()
-            ->title(number_format($matching) . ' of ' . number_format($report->rows) . ' rows match')
+            ->title(__('vibefilter::vibefilter.report.title', [
+                'matching' => number_format($matching),
+                'total' => number_format($report->rows),
+            ]))
             ->body(implode(' · ', $details))
             ->send();
     }
@@ -285,7 +290,7 @@ class VibeFilter extends BaseFilter
     protected function reportFailure(DriverException $exception, int $scored, int $total): void
     {
         $retry = Action::make('tryAgain')
-            ->label('Try again')
+            ->label(__('vibefilter::vibefilter.failure.try_again'))
             ->button()
             // Only a Livewire id goes into the script.
             ->alpineClickHandler("close(); Livewire.find('{$this->component()->getId()}').\$refresh();");
@@ -294,8 +299,8 @@ class VibeFilter extends BaseFilter
             Notification::make()
                 ->danger()
                 ->persistent()
-                ->title('The vibe filter could not run')
-                ->body($exception->getMessage() . ' The table isn\'t filtered.')
+                ->title(__('vibefilter::vibefilter.failure.title'))
+                ->body($exception->getMessage() . ' ' . __('vibefilter::vibefilter.failure.unfiltered'))
                 ->actions([$retry])
                 ->send();
 
@@ -307,12 +312,12 @@ class VibeFilter extends BaseFilter
         Notification::make()
             ->warning()
             ->persistent()
-            ->title(number_format($scored) . ' of ' . number_format($total) . ' rows scored')
-            ->body(implode(' ', [
-                'The API didn\'t answer for ' . number_format($missing) . ' ' . str('row')->plural($missing) . ', so the table only shows matches among the scored ones.',
-                'Trying again sends just the missing ' . number_format($missing) . '.',
-                '(' . $exception->getMessage() . ')',
+            ->title(__('vibefilter::vibefilter.failure.partial_title', [
+                'scored' => number_format($scored),
+                'total' => number_format($total),
             ]))
+            ->body(trans_choice('vibefilter::vibefilter.failure.partial_body', $missing, ['count' => number_format($missing)])
+                . ' (' . $exception->getMessage() . ')')
             ->actions([$retry])
             ->send();
     }
@@ -364,21 +369,16 @@ class VibeFilter extends BaseFilter
         Notification::make('vibefilter-limit-' . $token)
             ->warning()
             ->persistent()
-            ->title(number_format($unscored) . ' rows need a fresh score')
-            ->body(implode(' ', [
-                'The table has ' . number_format($total) . ' rows with the other filters and the search applied,',
-                'and ' . number_format($unscored) . ' of them have no cached score for this statement yet.',
-                'The limit is ' . number_format($max) . '.',
-                'Narrow the table down with other filters or a search to get under it, or run it on all of them now.',
-                'The table isn\'t filtered until then.',
+            ->title(trans_choice('vibefilter::vibefilter.limit.title', $unscored, ['count' => number_format($unscored)]))
+            ->body(__('vibefilter::vibefilter.limit.body', [
+                'total' => number_format($total),
+                'unscored' => number_format($unscored),
+                'limit' => number_format($max),
             ]))
             ->actions([
                 Action::make('runAnyway')
-                    ->label('Run anyway')
+                    ->label(__('vibefilter::vibefilter.limit.run_anyway'))
                     ->button()
-                    // Only ids, a filter name, a hex token and our own wording go into
-                    // the script, never user input. The progress note closes when the
-                    // run is done.
                     // Only ids, a filter name, a hex token and our own markup go into
                     // the script, never user input. The bar shows at once; the filter
                     // then streams the real progress into it.

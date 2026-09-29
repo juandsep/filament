@@ -21,6 +21,7 @@ class VibefilterServiceProvider extends PackageServiceProvider
             ->name(static::$name)
             ->hasConfigFile()
             ->hasViews()
+            ->hasTranslations()
             ->hasMigration('create_vibefilter_tables');
     }
 
