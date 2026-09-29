@@ -49,7 +49,7 @@ class ScorerTest extends TestCase
 
     public function test_equal_texts_are_asked_about_once(): void
     {
-        $scores = $this->scorer()->score('The customer is angry.', [1 => 'So angry.', 2 => "  So   angry. ", 3 => 'So angry.']);
+        $scores = $this->scorer()->score('The customer is angry.', [1 => 'So angry.', 2 => '  So   angry. ', 3 => 'So angry.']);
 
         $this->assertSame([1 => 0.9, 2 => 0.9, 3 => 0.9], $scores);
         $this->assertCount(1, $this->driver->calls[0]['texts']);

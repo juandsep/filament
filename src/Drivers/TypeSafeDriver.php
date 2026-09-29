@@ -9,9 +9,9 @@ use Illuminate\Http\Client\Pool;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
-use Throwable;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Throwable;
 use Vibefilter\Filament\Contracts\CountsRequests;
 use Vibefilter\Filament\Contracts\DecisionDriver;
 use Vibefilter\Filament\Exceptions\DriverException;
@@ -123,7 +123,7 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
      *
      * @param  list<array{payload: array<string, mixed>, keys: array<string, array-key>}>  $batches
      * @return array{0: array<array-key, float>, 1: list<array{0: array, 1: DriverException, 2: bool}>}
-     *         The scores, and each failed batch with its exception and whether splitting it could help.
+     *                                                                                                  The scores, and each failed batch with its exception and whether splitting it could help.
      */
     protected function run(array $batches, ?Closure $onScored, ?Closure $onProgress = null): array
     {
@@ -156,7 +156,7 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
                     fn (Throwable $exception) => $this->isRetryable($exception),
                     throw: false,
                 )
-                ->post(rtrim($this->baseUrl, '/').'/systemone', $batches[$index]['payload']),
+                ->post(rtrim($this->baseUrl, '/') . '/systemone', $batches[$index]['payload']),
             array_keys($batches),
         ), concurrency: max(1, $this->concurrency));
 
@@ -261,7 +261,7 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
 
         foreach (array_keys($texts) as $key) {
             do {
-                $tag = 'k'.bin2hex(random_bytes(3));
+                $tag = 'k' . bin2hex(random_bytes(3));
             } while (isset($keys[$tag]));
 
             $keys[$tag] = $key;
@@ -297,7 +297,7 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
     protected function answers(mixed $response): array
     {
         if ($response instanceof Throwable) {
-            throw new DriverException('TypeSafe request failed: '.$response->getMessage(), previous: $response);
+            throw new DriverException('TypeSafe request failed: ' . $response->getMessage(), previous: $response);
         }
 
         if (! $response instanceof Response) {
@@ -305,7 +305,7 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
         }
 
         if ($response->failed()) {
-            throw new DriverException("TypeSafe request failed with HTTP {$response->status()}: ".mb_substr($response->body(), 0, 300));
+            throw new DriverException("TypeSafe request failed with HTTP {$response->status()}: " . mb_substr($response->body(), 0, 300));
         }
 
         return $response->json('answers') ?? [];

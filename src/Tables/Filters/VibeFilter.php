@@ -65,7 +65,7 @@ class VibeFilter extends BaseFilter
         ));
 
         $this->indicateUsing(fn (array $data): array => filled($data['statement'] ?? null)
-            ? [Indicator::make('Vibe: '.$data['statement'])]
+            ? [Indicator::make('Vibe: ' . $data['statement'])]
             : []);
 
         $this->excludeWhenResolvingRecord();
@@ -246,25 +246,25 @@ class VibeFilter extends BaseFilter
      */
     protected function reportRun(ScoringReport $report, int $matching): void
     {
-        $details = [number_format($report->scored).' new '.str('row')->plural($report->scored).' scored'];
+        $details = [number_format($report->scored) . ' new ' . str('row')->plural($report->scored) . ' scored'];
 
         if ($report->requests) {
-            $details[0] .= ' in '.$report->requests.' '.str('request')->plural($report->requests);
+            $details[0] .= ' in ' . $report->requests . ' ' . str('request')->plural($report->requests);
         }
 
         if ($report->retries()) {
-            $details[] = $report->retries().' retried after the API didn\'t answer';
+            $details[] = $report->retries() . ' retried after the API didn\'t answer';
         }
 
-        $details[] = number_format($report->seconds, 1).' s';
+        $details[] = number_format($report->seconds, 1) . ' s';
 
         if ($report->cached) {
-            $details[] = number_format($report->cached).' answered from the cache';
+            $details[] = number_format($report->cached) . ' answered from the cache';
         }
 
         Notification::make()
             ->success()
-            ->title(number_format($matching).' of '.number_format($report->rows).' rows match')
+            ->title(number_format($matching) . ' of ' . number_format($report->rows) . ' rows match')
             ->body(implode(' · ', $details))
             ->send();
     }
@@ -286,7 +286,7 @@ class VibeFilter extends BaseFilter
                 ->danger()
                 ->persistent()
                 ->title('The vibe filter could not run')
-                ->body($exception->getMessage().' The table isn\'t filtered.')
+                ->body($exception->getMessage() . ' The table isn\'t filtered.')
                 ->actions([$retry])
                 ->send();
 
@@ -298,11 +298,11 @@ class VibeFilter extends BaseFilter
         Notification::make()
             ->warning()
             ->persistent()
-            ->title(number_format($scored).' of '.number_format($total).' rows scored')
+            ->title(number_format($scored) . ' of ' . number_format($total) . ' rows scored')
             ->body(implode(' ', [
-                'The API didn\'t answer for '.number_format($missing).' '.str('row')->plural($missing).', so the table only shows matches among the scored ones.',
-                'Trying again sends just the missing '.number_format($missing).'.',
-                '('.$exception->getMessage().')',
+                'The API didn\'t answer for ' . number_format($missing) . ' ' . str('row')->plural($missing) . ', so the table only shows matches among the scored ones.',
+                'Trying again sends just the missing ' . number_format($missing) . '.',
+                '(' . $exception->getMessage() . ')',
             ]))
             ->actions([$retry])
             ->send();
@@ -313,7 +313,8 @@ class VibeFilter extends BaseFilter
      * (Livewire streaming). The bar disappears when the table re-renders.
      */
     protected function streamProgress(int $rows, int $done, int $total, int $retries): void
-    {        $this->getLivewire()->stream(
+    {
+        $this->getLivewire()->stream(
             content: $this->progressHtml($rows, $done, $total, $retries),
             replace: true,
             el: '[data-vibefilter-progress]',
@@ -331,19 +332,19 @@ class VibeFilter extends BaseFilter
     protected function askBeforeRunning(string $statement, int $unscored, int $total, int $max): void
     {
         $livewireId = $this->getLivewire()->getId();
-        $statePath = 'tableFilters.'.$this->getName().'.run_anyway';
+        $statePath = 'tableFilters.' . $this->getName() . '.run_anyway';
         $token = $this->confirmationToken($statement);
         $requests = (int) ceil($unscored / max(1, (int) config('vibefilter.batch_size', 100)));
         $startingBar = Js::from($this->progressHtml($unscored, 0, $requests, 0));
 
-        Notification::make('vibefilter-limit-'.$token)
+        Notification::make('vibefilter-limit-' . $token)
             ->warning()
             ->persistent()
-            ->title(number_format($unscored).' rows need a fresh score')
+            ->title(number_format($unscored) . ' rows need a fresh score')
             ->body(implode(' ', [
-                'The table has '.number_format($total).' rows with the other filters and the search applied,',
-                'and '.number_format($unscored).' of them have no cached score for this statement yet.',
-                'The limit is '.number_format($max).'.',
+                'The table has ' . number_format($total) . ' rows with the other filters and the search applied,',
+                'and ' . number_format($unscored) . ' of them have no cached score for this statement yet.',
+                'The limit is ' . number_format($max) . '.',
                 'Narrow the table down with other filters or a search to get under it, or run it on all of them now.',
                 'The table isn\'t filtered until then.',
             ]))
@@ -384,7 +385,7 @@ class VibeFilter extends BaseFilter
         }
 
         return collect($columns)
-            ->map(fn (string $column) => $column.': '.$row->getAttribute($column))
+            ->map(fn (string $column) => $column . ': ' . $row->getAttribute($column))
             ->implode("\n");
     }
 }

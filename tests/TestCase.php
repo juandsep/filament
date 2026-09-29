@@ -16,6 +16,6 @@ abstract class TestCase extends Orchestra
 
     protected function defineDatabaseMigrations(): void
     {
-        (include __DIR__.'/../database/migrations/create_vibefilter_tables.php.stub')->up();
+        (include __DIR__ . '/../database/migrations/create_vibefilter_tables.php.stub')->up();
     }
 }

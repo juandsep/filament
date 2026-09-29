@@ -1,7 +1,16 @@
 {
     "name": "vibefilter/filament",
     "description": "Filter your Filament tables by vibe: natural-language table filters powered by TypeSafe Jev.",
-    "keywords": ["filament", "filament-plugin", "laravel", "jev", "typesafe", "ai", "natural-language", "filter"],
+    "keywords": [
+        "filament",
+        "filament-plugin",
+        "laravel",
+        "jev",
+        "typesafe",
+        "ai",
+        "natural-language",
+        "filter"
+    ],
     "homepage": "https://vibefilter.dev",
     "license": "MIT",
     "require": {
@@ -10,6 +19,7 @@
         "spatie/laravel-package-tools": "^1.16"
     },
     "require-dev": {
+        "laravel/pint": "^1.32",
         "orchestra/testbench": "^11.0",
         "phpunit/phpunit": "^12.0"
     },
@@ -24,7 +34,9 @@
         }
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit",
+        "lint": "pint",
+        "test:lint": "pint --test"
     },
     "extra": {
         "laravel": {

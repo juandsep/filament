@@ -7,9 +7,9 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Throwable;
 use Vibefilter\Filament\Contracts\DecisionDriver;
 use Vibefilter\Filament\Drivers\TypeSafeDriver;
-use Throwable;
 use Vibefilter\Filament\Exceptions\DriverException;
 
 class TypeSafeDriverTest extends TestCase
