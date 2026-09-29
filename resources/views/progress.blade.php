@@ -1,0 +1,26 @@
+{{-- Streamed into the table while the vibe filter scores rows. --}}
+@php($percent = $total > 0 ? (int) round($done / $total * 100) : 0)
+<div
+    role="status"
+    style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; padding: 0.625rem 1rem; font-size: 0.875rem; border-top: 1px solid color-mix(in oklab, currentColor 10%, transparent);"
+>
+    <span style="font-weight: 500; white-space: nowrap;">Scoring {{ number_format($rows) }} {{ str('row')->plural($rows) }}</span>
+
+    <div
+        role="progressbar"
+        aria-label="Vibe filter progress"
+        aria-valuemin="0"
+        aria-valuemax="{{ $total }}"
+        aria-valuenow="{{ $done }}"
+        style="flex: 1 1 8rem; min-width: 6rem; height: 0.375rem; border-radius: 9999px; overflow: hidden; background: color-mix(in oklab, currentColor 12%, transparent);"
+    >
+        <div style="height: 100%; width: {{ $percent }}%; border-radius: 9999px; background: var(--primary-500); transition: width 0.3s;"></div>
+    </div>
+
+    <span style="white-space: nowrap; font-variant-numeric: tabular-nums; opacity: 0.75;">
+        {{ $done }} / {{ $total }} {{ str('request')->plural($total) }} done
+        @if ($retries)
+            · {{ $retries }} retried
+        @endif
+    </span>
+</div>
