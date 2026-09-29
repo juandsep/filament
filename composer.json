@@ -3,16 +3,31 @@
     "description": "Filter your Filament tables by vibe: natural-language table filters powered by TypeSafe Jev.",
     "keywords": [
         "filament",
+        "filamentphp",
         "filament-plugin",
         "laravel",
+        "ai",
+        "zero-shot",
+        "classification",
+        "natural-language",
+        "filter",
         "jev",
         "typesafe",
-        "ai",
-        "natural-language",
-        "filter"
+        "openrouter"
     ],
     "homepage": "https://vibefilter.dev",
+    "support": {
+        "issues": "https://github.com/vibefilter/filament/issues",
+        "source": "https://github.com/vibefilter/filament"
+    },
     "license": "MIT",
+    "authors": [
+        {
+            "name": "András Horváth",
+            "email": "vibefilter@andrashorvath.dev",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "filament/filament": "^5.9",
