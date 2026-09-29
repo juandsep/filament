@@ -2,7 +2,7 @@
 
 All notable changes to `vibefilter/filament` will be documented in this file.
 
-## Unreleased
+## 0.1.0 - 2026-09-29
 
 - Requires PHP 8.2+, Laravel 12.36+ or 13, and Filament 5.9+.
 - Natural-language table filter for Filament 5: keeps the rows a plain-English statement is true for.
