@@ -53,6 +53,19 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
         return 'typesafe';
     }
 
+    /**
+     * The service's name in error messages.
+     */
+    protected function label(): string
+    {
+        return 'TypeSafe';
+    }
+
+    protected function missingKeyMessage(): string
+    {
+        return 'TypeSafe API key is missing. Set TYPESAFE_API_KEY in your .env file.';
+    }
+
     public function lastRequestCount(): int
     {
         return $this->lastRequestCount;
@@ -75,7 +88,7 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
         }
 
         if (blank($this->apiKey)) {
-            throw new DriverException('TypeSafe API key is missing. Set TYPESAFE_API_KEY in your .env file.');
+            throw new DriverException($this->missingKeyMessage());
         }
 
         $batches = array_map(
@@ -207,7 +220,7 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
             $probability = $answers[$tag]['noul'] ?? null;
 
             if (! is_numeric($probability)) {
-                throw new DriverException("TypeSafe returned no answer for row #{$tag}.");
+                throw new DriverException("{$this->label()} returned no answer for row #{$tag}.");
             }
 
             $scores[$key] = (float) $probability;
@@ -298,15 +311,15 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
     protected function answers(mixed $response): array
     {
         if ($response instanceof Throwable) {
-            throw new DriverException('TypeSafe request failed: ' . $response->getMessage(), previous: $response);
+            throw new DriverException($this->label() . ' request failed: ' . $response->getMessage(), previous: $response);
         }
 
         if (! $response instanceof Response) {
-            throw new DriverException('TypeSafe request returned no response.');
+            throw new DriverException($this->label() . ' request returned no response.');
         }
 
         if ($response->failed()) {
-            throw new DriverException("TypeSafe request failed with HTTP {$response->status()}: " . mb_substr($response->body(), 0, 300));
+            throw new DriverException("{$this->label()} request failed with HTTP {$response->status()}: " . mb_substr($response->body(), 0, 300));
         }
 
         return $response->json('answers') ?? [];

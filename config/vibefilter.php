@@ -3,7 +3,8 @@
 return [
 
     /*
-    | The decision driver used to answer questions about rows.
+    | The decision driver used to answer questions about rows: "typesafe" for
+    | TypeSafe's own API, or "openrouter" for Jev through OpenRouter.
     */
     'driver' => env('VIBEFILTER_DRIVER', 'typesafe'),
 
@@ -14,6 +15,15 @@ return [
             'model' => env('TYPESAFE_MODEL', 'jev-latest'),
             'timeout' => 60,
             // Pauses (ms) before retrying a batch that hit a rate limit or a server error.
+            'retry_delays' => [500, 2000, 5000],
+        ],
+
+        'openrouter' => [
+            'api_key' => env('OPENROUTER_API_KEY'),
+            'base_url' => env('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1'),
+            // OpenRouter's name for Jev; unlike TypeSafe it has no "latest" alias.
+            'model' => env('OPENROUTER_MODEL', 'typesafe/jev-1.13'),
+            'timeout' => 60,
             'retry_delays' => [500, 2000, 5000],
         ],
     ],
