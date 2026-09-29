@@ -2,6 +2,7 @@
 
 namespace Vibefilter\Filament\Livewire;
 
+use Closure;
 use Filament\Tables\Contracts\HasTable;
 use Livewire\ComponentHook;
 use Vibefilter\Filament\Tables\Filters\VibeFilter;
@@ -17,21 +18,27 @@ class PrescoreVibeFilters extends ComponentHook
     /**
      * "Run anyway", and filters on tables that apply them without an Apply button.
      */
-    public function update($propertyName, $fullPath, $newValue)
+    public function update(string $propertyName, string $fullPath, mixed $newValue): ?Closure
     {
         if ($propertyName === 'tableFilters') {
             return fn () => $this->prescore();
         }
+
+        return null;
     }
 
     /**
      * The filters form's Apply button.
+     *
+     * @param  array<mixed>  $params
      */
-    public function call($method, $params, $returnEarly)
+    public function call(string $method, array $params, mixed $returnEarly): ?Closure
     {
         if ($method === 'applyTableFilters') {
             return fn () => $this->prescore();
         }
+
+        return null;
     }
 
     protected function prescore(): void

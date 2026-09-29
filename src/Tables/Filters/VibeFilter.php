@@ -10,7 +10,10 @@ use Filament\Tables\Filters\BaseFilter;
 use Filament\Tables\Filters\Indicator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Js;
+use Livewire\Component;
+use LogicException;
 use Vibefilter\Filament\Exceptions\DriverException;
 use Vibefilter\Filament\Scorer;
 use Vibefilter\Filament\ScoringReport;
@@ -135,6 +138,9 @@ class VibeFilter extends BaseFilter
         $this->resolve($state['statement'] ?? null, $state['run_anyway'] ?? null);
     }
 
+    /**
+     * @param  Builder<Model>  $query
+     */
     protected function applyStatement(Builder $query, ?string $statement, ?string $runAnyway): void
     {
         if ($this->collectingCandidates) {
@@ -174,6 +180,8 @@ class VibeFilter extends BaseFilter
      * The rows the table shows with every other filter and the search applied.
      * Filament applies filters inside a nested where, which can't see the rest,
      * so this asks the table for its whole filtered query, minus this filter.
+     *
+     * @return Builder<Model>
      */
     protected function candidateQuery(): Builder
     {
@@ -187,6 +195,7 @@ class VibeFilter extends BaseFilter
     }
 
     /**
+     * @param  Builder<Model>  $candidates
      * @return array<array-key>|null Null when the table should stay unfiltered (not run yet, or scoring failed).
      */
     protected function passingKeys(Builder $candidates, string $statement, bool $force): ?array
@@ -279,7 +288,7 @@ class VibeFilter extends BaseFilter
             ->label('Try again')
             ->button()
             // Only a Livewire id goes into the script.
-            ->alpineClickHandler("close(); Livewire.find('{$this->getLivewire()->getId()}').\$refresh();");
+            ->alpineClickHandler("close(); Livewire.find('{$this->component()->getId()}').\$refresh();");
 
         if ($scored === 0) {
             Notification::make()
@@ -314,7 +323,7 @@ class VibeFilter extends BaseFilter
      */
     protected function streamProgress(int $rows, int $done, int $total, int $retries): void
     {
-        $this->getLivewire()->stream(
+        $this->component()->stream(
             content: $this->progressHtml($rows, $done, $total, $retries),
             replace: true,
             el: '[data-vibefilter-progress]',
@@ -323,7 +332,22 @@ class VibeFilter extends BaseFilter
 
     protected function progressHtml(int $rows, int $done, int $total, int $retries): string
     {
-        return view('vibefilter::progress', compact('rows', 'done', 'total', 'retries'))->render();
+        return View::make('vibefilter::progress', compact('rows', 'done', 'total', 'retries'))->render();
+    }
+
+    /**
+     * The table's Livewire component. Filament types it as the HasTable contract,
+     * which leaves out Livewire's own methods (getId, stream).
+     */
+    protected function component(): Component
+    {
+        $livewire = $this->getLivewire();
+
+        if (! $livewire instanceof Component) {
+            throw new LogicException('The vibe filter only works on tables that live in a Livewire component.');
+        }
+
+        return $livewire;
     }
 
     /**
@@ -331,7 +355,7 @@ class VibeFilter extends BaseFilter
      */
     protected function askBeforeRunning(string $statement, int $unscored, int $total, int $max): void
     {
-        $livewireId = $this->getLivewire()->getId();
+        $livewireId = $this->component()->getId();
         $statePath = 'tableFilters.' . $this->getName() . '.run_anyway';
         $token = $this->confirmationToken($statement);
         $requests = (int) ceil($unscored / max(1, (int) config('vibefilter.batch_size', 100)));

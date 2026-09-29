@@ -1,0 +1,15 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+    paths:
+        - src
+        - config
+        - database
+    tmpDir: build/phpstan
+    checkOctaneCompatibility: true
+    checkModelProperties: true
+    # config/vibefilter.php is the package's config file, where env() belongs;
+    # Larastan only recognises the application's config directory.
+    noEnvCallsOutsideOfConfig: false

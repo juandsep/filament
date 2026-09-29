@@ -120,10 +120,11 @@ class TypeSafeDriver implements CountsRequests, DecisionDriver
     /**
      * Sends the batches in parallel, with retries, hands each batch that comes
      * back to $onScored, and reports every response to $onProgress as it lands.
+     * Returns the scores, and each failed batch with its exception and whether
+     * splitting it could help.
      *
      * @param  list<array{payload: array<string, mixed>, keys: array<string, array-key>}>  $batches
-     * @return array{0: array<array-key, float>, 1: list<array{0: array, 1: DriverException, 2: bool}>}
-     *                                                                                                  The scores, and each failed batch with its exception and whether splitting it could help.
+     * @return array{0: array<array-key, float>, 1: list<array{0: array{payload: array<string, mixed>, keys: array<string, array-key>}, 1: DriverException, 2: bool}>}
      */
     protected function run(array $batches, ?Closure $onScored, ?Closure $onProgress = null): array
     {

@@ -40,7 +40,8 @@ class VibefilterServiceProvider extends PackageServiceProvider
         // has to be registered before that: here, not in packageBooted().
         Livewire::componentHook(PrescoreVibeFilters::class);
 
-        $this->app->singleton(DecisionManager::class, fn ($app) => new DecisionManager($app));
+        // Scoped, not singleton: under Octane it's rebuilt for every request.
+        $this->app->scoped(DecisionManager::class, fn ($app) => new DecisionManager($app));
         $this->app->bind(DecisionDriver::class, fn ($app) => $app->make(DecisionManager::class)->driver());
         $this->app->bind(Scorer::class, fn ($app) => new Scorer($app->make(DecisionDriver::class)));
     }
