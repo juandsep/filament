@@ -7,7 +7,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/vibefilter/filament.svg?style=flat-square)](https://packagist.org/packages/vibefilter/filament)
 [![License](https://img.shields.io/packagist/l/vibefilter/filament.svg?style=flat-square)](https://github.com/vibefilter/filament/blob/main/LICENSE.md)
 
-![A reviews table filtered by "The customer is angry."](https://raw.githubusercontent.com/vibefilter/filament/main/art/hero.png)
+![Vibefilter in a Filament table: "The customer is angry." leaves 232 of 1,000 reviews, scored in 1.0 s for $0.0031](https://raw.githubusercontent.com/vibefilter/filament/main/art/demo.gif)
 
 Vibefilter turns any sentence into a zero-shot classifier for your Filament table: each row gets a calibrated probability that the statement is true, and the table keeps the rows above your threshold.
 
