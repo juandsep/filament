@@ -2,6 +2,8 @@
 
 **Filtering beyond SQL.** Filter your Filament tables by vibe.
 
+**[Try the live demo →](https://demo.vibefilter.dev/?utm_source=github&utm_medium=readme)** · [vibefilter.dev](https://vibefilter.dev/?utm_source=github&utm_medium=readme)
+
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/vibefilter/filament.svg?style=flat-square)](https://packagist.org/packages/vibefilter/filament)
 [![Tests](https://img.shields.io/github/actions/workflow/status/vibefilter/filament/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/vibefilter/filament/actions/workflows/tests.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/vibefilter/filament.svg?style=flat-square)](https://packagist.org/packages/vibefilter/filament)
