@@ -25,7 +25,7 @@ return [
         'scoring' => 'Scoring :count row|Scoring :count rows',
         'requests' => ':done / :total request done|:done / :total requests done',
         'retried' => ':count retried',
-        'label' => 'Vibe filter progress',
+        'label' => 'Vibefilter progress',
     ],
 
     'report' => [
@@ -40,7 +40,7 @@ return [
     ],
 
     'failure' => [
-        'title' => 'The vibe filter could not run',
+        'title' => 'Vibefilter could not run',
         'unfiltered' => 'The table isn\'t filtered.',
         'partial_title' => ':scored of :total rows scored',
         'partial_body' => 'The API didn\'t answer for :count row, so the table only shows matches among the scored ones. Trying again sends just the missing :count.|The API didn\'t answer for :count rows, so the table only shows matches among the scored ones. Trying again sends just the missing :count.',

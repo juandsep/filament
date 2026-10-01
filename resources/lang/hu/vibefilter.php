@@ -26,7 +26,7 @@ return [
         'scoring' => ':count sor pontozása',
         'requests' => ':done / :total kérés kész',
         'retried' => ':count újrapróbálva',
-        'label' => 'A vibe-szűrő haladása',
+        'label' => 'A Vibefilter haladása',
     ],
 
     'report' => [
@@ -41,7 +41,7 @@ return [
     ],
 
     'failure' => [
-        'title' => 'A vibe-szűrő nem tudott lefutni',
+        'title' => 'A Vibefilter nem tudott lefutni',
         'unfiltered' => 'A tábla nincs szűrve.',
         'partial_title' => ':total sorból :scored pontozva',
         'partial_body' => ':count sorra nem válaszolt az API, ezért a tábla csak a pontozott sorok közül mutatja a találatokat. Újrapróbáláskor csak a hiányzó :count sor megy ki.',

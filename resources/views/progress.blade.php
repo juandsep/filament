@@ -1,4 +1,4 @@
-{{-- Streamed into the table while the vibe filter scores rows. --}}
+{{-- Streamed into the table while Vibefilter scores rows. --}}
 @php($percent = $total > 0 ? (int) round($done / $total * 100) : 0)
 <div
     role="status"

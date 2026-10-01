@@ -228,7 +228,7 @@ class VibeFilterTest extends TestCase
 
         Livewire::test(ListReviews::class)
             ->filterTable('vibe', ['statement' => 'The customer is angry.'])
-            ->assertNotified('The vibe filter could not run')
+            ->assertNotified('Vibefilter could not run')
             ->assertCountTableRecords(2);
     }
 

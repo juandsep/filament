@@ -15,7 +15,7 @@ use Livewire\Component;
 use Vibefilter\Filament\Tables\Filters\VibeFilter;
 
 /**
- * A plain Filament table with a vibe filter next to an ordinary filter and a search.
+ * A plain Filament table with Vibefilter next to an ordinary filter and a search.
  */
 class ListReviews extends Component implements HasActions, HasSchemas, HasTable
 {

@@ -27,7 +27,7 @@ class VibefilterServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        // An empty slot above every table's filter indicators. The vibe filter
+        // An empty slot above every table's filter indicators. Vibefilter
         // streams its progress bar into it while it scores rows.
         FilamentView::registerRenderHook(
             TablesRenderHook::TOOLBAR_AFTER,
